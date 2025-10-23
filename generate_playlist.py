@@ -39,7 +39,7 @@ source_urls = {
     "haberturk": "https://www.haberturk.com/canliyayin",
     "aspor": "https://www.aspor.com.tr/webtv/canli-yayin",
     "sıfır": "https://m.canlitv.direct/sifir-tv",
-    "idman": "dmax": https://idmantv.az/az",
+    "idman": "https://idmantv.az/az",
     "aztv": "https://www.aztv.az/az",
     "a2": "https://www.atv.com.tr/a2tv/canli-yayin",
 }
