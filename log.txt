@@ -1,0 +1,45 @@
+[23.10.2025 10:34:06] ==============================
+[23.10.2025 10:34:06] GitHub Actions M3U8 İşleyici Başladı
+[23.10.2025 10:34:06] ==============================
+[23.10.2025 10:34:06] İşleniyor: HALK TV
+[23.10.2025 10:34:07] HALK_TV.m3u8 oluşturuldu.
+[23.10.2025 10:34:07] İşleniyor: TELE1
+[23.10.2025 10:34:08] TELE1: M3U8 bulunamadı.
+[23.10.2025 10:34:08] İşleniyor: SÖZCÜ TV
+[23.10.2025 10:34:08] SÖZCÜ TV: M3U8 bulunamadı.
+[23.10.2025 10:34:08] İşleniyor: FOX TV
+[23.10.2025 10:34:11] FOX_TV.m3u8 oluşturuldu.
+[23.10.2025 10:34:11] İşleniyor: TV8
+[23.10.2025 10:34:12] TV8.m3u8 oluşturuldu.
+[23.10.2025 10:34:12] İşleniyor: TV8.5
+[23.10.2025 10:34:13] TV8.5: M3U8 bulunamadı.
+[23.10.2025 10:34:13] İşleniyor: KANAL D
+[23.10.2025 10:34:15] KANAL_D.m3u8 oluşturuldu.
+[23.10.2025 10:34:15] İşleniyor: TEVE2
+[23.10.2025 10:34:16] TEVE2.m3u8 oluşturuldu.
+[23.10.2025 10:34:16] İşleniyor: CNN TÜRK
+[23.10.2025 10:34:17] CNN TÜRK: M3U8 bulunamadı.
+[23.10.2025 10:34:17] İşleniyor: HABERTÜRK
+[23.10.2025 10:34:17] HABERTÜRK: M3U8 bulunamadı.
+[23.10.2025 10:34:17] İşleniyor: SIFIR TV
+[23.10.2025 10:34:17] SIFIR TV: M3U8 bulunamadı.
+[23.10.2025 10:34:17] İşleniyor: HTSPOR
+[23.10.2025 10:34:17] HTSPOR: M3U8 bulunamadı.
+[23.10.2025 10:34:17] İşleniyor: KEMAL SUNAL
+[23.10.2025 10:34:17] KEMAL SUNAL: M3U8 bulunamadı.
+[23.10.2025 10:34:17] İşleniyor: KEMAL SUNAL 2
+[23.10.2025 10:34:17] KEMAL SUNAL 2: M3U8 bulunamadı.
+[23.10.2025 10:34:17] İşleniyor: EN İYİ ŞABAN
+[23.10.2025 10:34:18] EN İYİ ŞABAN: M3U8 bulunamadı.
+[23.10.2025 10:34:18] İşleniyor: BEIN SPOR HABER
+[23.10.2025 10:34:18] BEIN SPOR HABER: M3U8 bulunamadı.
+[23.10.2025 10:34:18] İşleniyor: KRT
+[23.10.2025 10:34:18] KRT: M3U8 bulunamadı.
+[23.10.2025 10:34:18] İşleniyor: HALK TV (YouTube)
+[23.10.2025 10:34:18] HALK TV (YouTube): M3U8 bulunamadı.
+[23.10.2025 10:34:18] İşleniyor: ZEKİ - METİN
+[23.10.2025 10:34:18] ZEKİ - METİN: M3U8 bulunamadı.
+[23.10.2025 10:34:18] İşleniyor: ARZU FİLM
+[23.10.2025 10:34:18] ARZU FİLM: M3U8 bulunamadı.
+[23.10.2025 10:34:18] tv.m3u8 oluşturuldu.
+[23.10.2025 10:34:18] Tamamlandı.
