@@ -35,7 +35,6 @@ source_urls = {
     "ekolspor": "https://www.ekoltv.com.tr/canli-yayin",
     "ulketv": "https://www.ulketv.com/ulke-tv-canli-yayin",
     "htspor": "https://www.htspor.com/canli-yayin"
-    "tlc": "https://www.tlctv.com.tr/canli-izle",
     "haberturk": "https://www.haberturk.com/canliyayin",
     "aspor": "https://www.aspor.com.tr/webtv/canli-yayin",
     "sıfır": "https://m.canlitv.direct/sifir-tv",
