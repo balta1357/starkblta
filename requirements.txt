@@ -1,1 +1,4 @@
 requests[socks]
+requests
+beautifulsoup4
+
