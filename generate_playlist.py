@@ -30,7 +30,7 @@ source_urls = {
     "dmax": "https://www.dmax.com.tr/canli-izle",
     "tv360": "https://www.tv360.com.tr/canli-yayin",
     "beyaztv": "https://www.beyaztv.com.tr/canli-yayin",
-    "cnnturk": "https://www.cnnturk.com/canli-yayin",
+    "Tivi6": "https://tivi6.com.tr/canli-yayin",
     "ntv": "https://puhutv.com/ntv-canli-yayin",
     "ekolspor": "https://www.ekoltv.com.tr/canli-yayin",
     "ulketv": "https://www.ulketv.com/ulke-tv-canli-yayin",
