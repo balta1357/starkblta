@@ -43,3 +43,48 @@
 [23.10.2025 10:34:18] ARZU FİLM: M3U8 bulunamadı.
 [23.10.2025 10:34:18] tv.m3u8 oluşturuldu.
 [23.10.2025 10:34:18] Tamamlandı.
+[23.10.2025 10:37:09] ==============================
+[23.10.2025 10:37:09] GitHub Actions M3U8 İşleyici Başladı
+[23.10.2025 10:37:09] ==============================
+[23.10.2025 10:37:09] İşleniyor: HALK TV
+[23.10.2025 10:37:11] HALK_TV.m3u8 oluşturuldu.
+[23.10.2025 10:37:11] İşleniyor: TELE1
+[23.10.2025 10:37:11] TELE1: M3U8 bulunamadı.
+[23.10.2025 10:37:11] İşleniyor: SÖZCÜ TV
+[23.10.2025 10:37:11] SÖZCÜ TV: M3U8 bulunamadı.
+[23.10.2025 10:37:11] İşleniyor: FOX TV
+[23.10.2025 10:37:14] FOX_TV.m3u8 oluşturuldu.
+[23.10.2025 10:37:14] İşleniyor: TV8
+[23.10.2025 10:37:15] TV8.m3u8 oluşturuldu.
+[23.10.2025 10:37:15] İşleniyor: TV8.5
+[23.10.2025 10:37:15] TV8.5: M3U8 bulunamadı.
+[23.10.2025 10:37:15] İşleniyor: KANAL D
+[23.10.2025 10:37:16] KANAL_D.m3u8 oluşturuldu.
+[23.10.2025 10:37:16] İşleniyor: TEVE2
+[23.10.2025 10:37:17] TEVE2.m3u8 oluşturuldu.
+[23.10.2025 10:37:17] İşleniyor: CNN TÜRK
+[23.10.2025 10:37:18] CNN TÜRK: M3U8 bulunamadı.
+[23.10.2025 10:37:18] İşleniyor: HABERTÜRK
+[23.10.2025 10:37:18] HABERTÜRK: M3U8 bulunamadı.
+[23.10.2025 10:37:18] İşleniyor: SIFIR TV
+[23.10.2025 10:37:18] SIFIR TV: M3U8 bulunamadı.
+[23.10.2025 10:37:18] İşleniyor: HTSPOR
+[23.10.2025 10:37:18] HTSPOR: M3U8 bulunamadı.
+[23.10.2025 10:37:18] İşleniyor: KEMAL SUNAL
+[23.10.2025 10:37:18] KEMAL SUNAL: M3U8 bulunamadı.
+[23.10.2025 10:37:18] İşleniyor: KEMAL SUNAL 2
+[23.10.2025 10:37:18] KEMAL SUNAL 2: M3U8 bulunamadı.
+[23.10.2025 10:37:18] İşleniyor: EN İYİ ŞABAN
+[23.10.2025 10:37:18] EN İYİ ŞABAN: M3U8 bulunamadı.
+[23.10.2025 10:37:18] İşleniyor: BEIN SPOR HABER
+[23.10.2025 10:37:18] BEIN SPOR HABER: M3U8 bulunamadı.
+[23.10.2025 10:37:18] İşleniyor: KRT
+[23.10.2025 10:37:18] KRT: M3U8 bulunamadı.
+[23.10.2025 10:37:18] İşleniyor: HALK TV (YouTube)
+[23.10.2025 10:37:19] HALK TV (YouTube): M3U8 bulunamadı.
+[23.10.2025 10:37:19] İşleniyor: ZEKİ - METİN
+[23.10.2025 10:37:19] ZEKİ - METİN: M3U8 bulunamadı.
+[23.10.2025 10:37:19] İşleniyor: ARZU FİLM
+[23.10.2025 10:37:19] ARZU FİLM: M3U8 bulunamadı.
+[23.10.2025 10:37:19] tv.m3u8 oluşturuldu.
+[23.10.2025 10:37:19] Tamamlandı.
