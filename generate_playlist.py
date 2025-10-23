@@ -36,11 +36,7 @@ source_urls = {
     "ulketv": "https://www.ulketv.com/ulke-tv-canli-yayin",
     "htspor": "https://www.htspor.com/canli-yayin",
     "haberturk": "https://www.haberturk.com/canliyayin",
-    "aspor": "https://www.aspor.com.tr/webtv/canli-yayin",
-    "sifir": "https://m.canlitv.direct/sifir-tv",
-    "idman": "https://idmantv.az/az",
-    "aztv": "https://www.aztv.az/az",
-    "a2": "https://www.atv.com.tr/a2tv/canli-yayin"
+   
 }
 
 # === Kaynak 2: TrGoals Kanalları ===
