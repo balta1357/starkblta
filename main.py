@@ -4,6 +4,8 @@ import requests
 from yt_dlp import YoutubeDL
 from datetime import datetime
 
+COOKIE_FILE = "cookies.txt"  # GitHub Actions'ta secrets ile oluşturulacak
+
 def get_live_video_id(channel_url: str):
     """
     Verilen YouTube kanalındaki aktif canlı yayın ID'sini bulur.
@@ -20,25 +22,34 @@ def get_live_video_id(channel_url: str):
 
 def create_m3u(channel_name: str, video_id: str):
     """
-    Belirtilen video ID'den geçici .m3u dosyası oluşturur.
+    Belirtilen video ID'den .m3u dosyası oluşturur.
     """
     url = f"https://www.youtube.com/watch?v={video_id}"
-    with YoutubeDL({"skip_download": True, "quiet": True}) as ydl:
-        info = ydl.extract_info(url, download=False)
-        stream_url = info["url"]
+    ydl_opts = {
+        "skip_download": True,
+        "quiet": True,
+        "cookies": COOKIE_FILE,  # Cookie dosyasını kullan
+    }
 
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M")
-    filename = f"{channel_name}_{timestamp}.m3u"
+    try:
+        with YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(url, download=False)
+            stream_url = info["url"]
 
-    with open(filename, "w") as f:
-        f.write("#EXTM3U\n")
-        f.write(f"#EXTINF:-1,{channel_name} (YouTube)\n")
-        f.write(stream_url + "\n")
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M")
+        filename = f"{channel_name}_{timestamp}.m3u"
 
-    print(f"[OK] {filename} oluşturuldu.")
+        with open(filename, "w") as f:
+            f.write("#EXTM3U\n")
+            f.write(f"#EXTINF:-1,{channel_name} (YouTube)\n")
+            f.write(stream_url + "\n")
+
+        print(f"[OK] {filename} oluşturuldu.")
+
+    except Exception as e:
+        print(f"[ERROR] {channel_name} M3U oluşturulamadı: {e}")
 
 if __name__ == "__main__":
-    # 🔹 İzlenecek kanallar listesi
     channels = {
         "SozcuTV": "@sozcuhaber",
         "HalkTV": "@HalkTVCanli",
