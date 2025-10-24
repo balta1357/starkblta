@@ -2,8 +2,8 @@ name: Multi YouTube Live M3U Recorder
 
 on:
   schedule:
-    - cron: "*/30 * * * *"  # Her 30 dakikada bir çalışır
-  workflow_dispatch:        # Manuel olarak başlatabilirsin
+    - cron: "*/30 * * * *"  # Her 30 dakikada bir çalıştır
+  workflow_dispatch:
   push:
     branches: [ main ]
 
@@ -22,6 +22,9 @@ jobs:
 
       - name: Gerekli kütüphaneleri yükle
         run: pip install yt-dlp requests
+
+      - name: Cookie dosyasını oluştur
+        run: echo "${{ secrets.YOUTUBE_COOKIES }}" > cookies.txt
 
       - name: Canlı yayınları kontrol et ve M3U oluştur
         run: python main.py
