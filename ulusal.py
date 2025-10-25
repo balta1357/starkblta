@@ -2,10 +2,10 @@ import requests
 import yaml
 import json
 import os
-import time
 from datetime import datetime
 import subprocess
 from bs4 import BeautifulSoup
+from concurrent.futures import ThreadPoolExecutor
 
 CONFIG_FILE = "config.json"
 YAML_FILE = "streams.yaml"
@@ -48,6 +48,7 @@ FALLBACK_LINKS = {
 }
 
 def find_m3u8(html):
+    from bs4 import BeautifulSoup
     soup = BeautifulSoup(html, "html.parser")
     for tag in soup.find_all(["source", "script", "video"]):
         text = str(tag)
@@ -73,51 +74,63 @@ def get_stream(channel_name, url):
         print(f"⚠️ {channel_name}: Link bulunamadı.")
     return fallback
 
-def record_stream(channel_name, m3u8_url):
-    output_dir = "recordings"
-    os.makedirs(output_dir, exist_ok=True)
+def record_stream(channel_name, m3u8_url, duration=3600):
+    os.makedirs("recordings", exist_ok=True)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    filename = f"{output_dir}/{channel_name}_{timestamp}.ts"
+    filename = f"recordings/{channel_name}_{timestamp}.ts"
     print(f"🎬 {channel_name} kaydediliyor: {filename}")
     try:
         subprocess.run([
-            "ffmpeg", "-y", "-i", m3u8_url,
-            "-c", "copy", filename
+            "ffmpeg", "-y", "-i", m3u8_url, "-c", "copy", "-t", str(duration), filename
         ], check=True)
+    except FileNotFoundError:
+        print("❌ ffmpeg bulunamadı!")
     except subprocess.CalledProcessError as e:
         print(f"❌ {channel_name} kaydı başarısız:", e)
-    except FileNotFoundError:
-        print(f"❌ ffmpeg bulunamadı. Kaydedilemiyor: {channel_name}")
 
-def update_streams(record=False):
+def fetch_channel(name_url):
+    name, url = name_url
+    link = get_stream(name, url)
+    return name, link
+
+def update_streams(record=False, duration=3600):
     with open(CONFIG_FILE, "r", encoding="utf-8") as f:
         config = json.load(f)
 
     streams = {}
-    for name, url in CHANNELS.items():
-        link = get_stream(name, url)
+
+    # Paralel olarak kanalları çek
+    from concurrent.futures import ThreadPoolExecutor
+    with ThreadPoolExecutor(max_workers=5) as executor:
+        results = executor.map(fetch_channel, CHANNELS.items())
+
+    for name, link in results:
         streams[name] = {"url": link, "updated": datetime.now().isoformat()}
         if record and link:
-            record_stream(name, link)
+            record_stream(name, link, duration=duration)
 
+    # Config dosyasını güncelle
     config["streams"] = streams
-
     with open(CONFIG_FILE, "w", encoding="utf-8") as f:
         json.dump(config, f, indent=2, ensure_ascii=False)
 
+    # YAML dosyasını oluştur
     with open(YAML_FILE, "w", encoding="utf-8") as f:
         yaml.dump(streams, f, allow_unicode=True)
 
+    # channels.txt güncelle
     output_path = config.get("output_path", "output/channels.txt")
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     with open(output_path, "w", encoding="utf-8") as f:
         for name, data in streams.items():
             f.write(f"{name}: {data['url']}\n")
 
-    print(f"✅ {len(streams)} kanal güncellendi ve kaydedildi." if record else f"✅ {len(streams)} kanal güncellendi.")
+    print(f"✅ {len(streams)} kanal güncellendi.")
 
 if __name__ == "__main__":
-    while True:
-        update_streams(record=True)
-        print("⏰ 2 saat bekleniyor...")
-        time.sleep(7200)
+    # Örnek kullanım:
+    # Sadece linkleri hızlıca güncelle
+    update_streams(record=False)
+
+    # Kayıt yapmak istersen:
+    # update_streams(record=True, duration=3600)
