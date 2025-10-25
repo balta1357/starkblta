@@ -21,7 +21,7 @@ source_urls = {
    "tabii": "https://www.tabii.com/tr/watch/live/trt1?trackId=150002",
     "nowtv": "https://www.nowtv.com.tr/canli-yayin",
     "showtv": "https://www.showtv.com.tr/canli-yayin",
-    "startv": "https://puhutv.com/star-tv-canli-yayin",
+    "htspor": "https://www.htspor.com/canli-yayin",
     "tv8": "https://www.tv8.com.tr/canli-yayin",
     "tv8bucuk": "https://www.tv8bucuk.com/tv8-5-canli-yayin",
     "atv": "https://www.atv.com.tr/canli-yayin",
@@ -30,12 +30,9 @@ source_urls = {
     "dmax": "https://www.dmax.com.tr/canli-izle",
     "tv360": "https://www.tv360.com.tr/canli-yayin",
     "beyaztv": "https://www.beyaztv.com.tr/canli-yayin",
-    "Tivi6": "https://tivi6.com.tr/canli-yayin",
     "ntv": "https://puhutv.com/ntv-canli-yayin",
     "ekolspor": "https://www.ekoltv.com.tr/canli-yayin",
     "ulketv": "https://www.ulketv.com/ulke-tv-canli-yayin",
-    "htspor": "https://www.htspor.com/canli-yayin",
-    "haberturk": "https://www.haberturk.com/canliyayin",
    
 }
 
