@@ -1,32 +1,28 @@
-name: Update Live TV Streams
+name: Update TV Streams
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:  # Manuel tetikleme
   schedule:
-    - cron: '0 */2 * * *' # Her 2 saatte bir çalışır (UTC)
+    - cron: "0 */2 * * *"  # Her 2 saatte bir çalıştır
 
 jobs:
   update-streams:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Repoyu klonla
+      - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Python kur
+      - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.11"
 
-      - name: Gerekli paketleri yükle ve ffmpeg kur
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install requests beautifulsoup4 pyyaml
-          sudo apt-get update
-          sudo apt-get install -y ffmpeg
+          pip install requests pyyaml beautifulsoup4
 
-      - name: Streamleri güncelle ve kaydet
-        run: python ulusal.py
-
+      - name: Update TV Streams (only links)
+        run: |
+          python ulusal.py
