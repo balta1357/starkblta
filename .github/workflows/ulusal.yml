@@ -1,6 +1,5 @@
 name: Update Live TV Streams
 
-# Workflow tetikleyicisi
 on:
   push:
     branches:
@@ -21,11 +20,13 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Gerekli paketleri yükle
+      - name: Gerekli paketleri yükle ve ffmpeg kur
         run: |
           python -m pip install --upgrade pip
           pip install requests beautifulsoup4 pyyaml
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
 
-      - name: Streamleri güncelle
-        run: |
-          python ulusal.py
+      - name: Streamleri güncelle ve kaydet
+        run: python ulusal.py
+
