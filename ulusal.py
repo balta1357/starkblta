@@ -4,8 +4,8 @@ import json
 import os
 import time
 from datetime import datetime
-from bs4 import BeautifulSoup
 import subprocess
+from bs4 import BeautifulSoup
 
 CONFIG_FILE = "config.json"
 YAML_FILE = "streams.yaml"
@@ -29,7 +29,6 @@ CHANNELS = {
     "aspor": "https://www.aspor.com.tr/canli-yayin"
 }
 
-# Yedek linkler (FALLBACK)
 FALLBACK_LINKS = {
     "teve2": "https://demiroren.daioncdn.net/teve2/teve2.m3u8",
     "showtv": "https://tv.ensonhaber.com/tv/showtv.m3u8",
@@ -46,11 +45,9 @@ FALLBACK_LINKS = {
     "beyaztv": "https://beyaztv.medya.trt.com.tr/master.m3u8",
     "a2": "https://a2tv.medya.trt.com.tr/master.m3u8",
     "atv": "https://tv-atv.medya.trt.com.tr/master.m3u8",
-    "startv": "https://cdn2.skygo.mn/live/disk1/Star/HLS-FTA/Star.m3u8"
 }
 
 def find_m3u8(html):
-    from bs4 import BeautifulSoup
     soup = BeautifulSoup(html, "html.parser")
     for tag in soup.find_all(["source", "script", "video"]):
         text = str(tag)
@@ -76,7 +73,7 @@ def get_stream(channel_name, url):
         print(f"⚠️ {channel_name}: Link bulunamadı.")
     return fallback
 
-def record_stream(channel_name, m3u8_url, duration=3600):
+def record_stream(channel_name, m3u8_url):
     output_dir = "recordings"
     os.makedirs(output_dir, exist_ok=True)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -89,8 +86,10 @@ def record_stream(channel_name, m3u8_url, duration=3600):
         ], check=True)
     except subprocess.CalledProcessError as e:
         print(f"❌ {channel_name} kaydı başarısız:", e)
+    except FileNotFoundError:
+        print(f"❌ ffmpeg bulunamadı. Kaydedilemiyor: {channel_name}")
 
-def update_streams(record=False, duration=3600):
+def update_streams(record=False):
     with open(CONFIG_FILE, "r", encoding="utf-8") as f:
         config = json.load(f)
 
@@ -99,7 +98,7 @@ def update_streams(record=False, duration=3600):
         link = get_stream(name, url)
         streams[name] = {"url": link, "updated": datetime.now().isoformat()}
         if record and link:
-            record_stream(name, link, duration)
+            record_stream(name, link)
 
     config["streams"] = streams
 
@@ -119,6 +118,6 @@ def update_streams(record=False, duration=3600):
 
 if __name__ == "__main__":
     while True:
-        update_streams(record=True, duration=3600)
+        update_streams(record=True)
         print("⏰ 2 saat bekleniyor...")
         time.sleep(7200)
