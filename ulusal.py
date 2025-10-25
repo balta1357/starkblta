@@ -30,6 +30,7 @@ CHANNELS = {
     "aspor": "https://www.aspor.com.tr/canli-yayin"
 }
 
+# Tüm kanalların fallback linkleri dolu
 FALLBACK_LINKS = {
     "teve2": "https://demiroren.daioncdn.net/teve2/teve2.m3u8",
     "showtv": "https://tv.ensonhaber.com/tv/showtv.m3u8",
@@ -46,6 +47,7 @@ FALLBACK_LINKS = {
     "beyaztv": "https://beyaztv.medya.trt.com.tr/master.m3u8",
     "a2": "https://a2tv.medya.trt.com.tr/master.m3u8",
     "atv": "https://tv-atv.medya.trt.com.tr/master.m3u8",
+    "nowtv": "https://nowtv.medya.trt.com.tr/master.m3u8"
 }
 
 HEADERS = {
@@ -54,34 +56,25 @@ HEADERS = {
                   "Chrome/116.0.0.0 Safari/537.36"
 }
 
-def find_m3u8(html):
-    soup = BeautifulSoup(html, "html.parser")
-    for tag in soup.find_all(["source", "script", "video"]):
-        text = str(tag)
-        if ".m3u8" in text:
-            start = text.find("https://")
-            end = text.find(".m3u8") + len(".m3u8")
-            return text[start:end]
-    return None
-
 def get_stream(channel_name, url):
     try:
         r = requests.get(url, headers=HEADERS, timeout=10)
         r.raise_for_status()
-        link = find_m3u8(r.text)
-        if link:
+        html = r.text
+        start = html.find(".m3u8")
+        if start != -1:
+            # sayfa içinde m3u8 bulduysak linki ayıkla
+            link_start = html.rfind("https://", 0, start)
+            link = html[link_start:start+len(".m3u8")]
             return link
-    except requests.exceptions.HTTPError as e:
-        print(f"❌ {channel_name} alınamadı: {e}")
     except Exception as e:
         print(f"❌ {channel_name} alınamadı:", e)
 
-    fallback = FALLBACK_LINKS.get(channel_name, "")
+    fallback = FALLBACK_LINKS.get(channel_name)
     if fallback:
         print(f"⚠️ {channel_name}: Yedek link kullanıldı.")
-    else:
-        print(f"⚠️ {channel_name}: Link bulunamadı.")
-    return fallback
+        return fallback
+    return None
 
 def record_stream(channel_name, m3u8_url, duration=3600):
     os.makedirs("recordings", exist_ok=True)
@@ -103,13 +96,16 @@ def fetch_channel(name_url):
     return name, link
 
 def update_streams(record=False, duration=3600):
+    if not os.path.exists(CONFIG_FILE):
+        with open(CONFIG_FILE, "w", encoding="utf-8") as f:
+            json.dump({"output_path": "output/channels.txt", "streams": {}}, f, indent=2)
+
     with open(CONFIG_FILE, "r", encoding="utf-8") as f:
         config = json.load(f)
 
     streams = {}
 
-    # Paralel olarak kanalları çek
-    from concurrent.futures import ThreadPoolExecutor
+    # Paralel kanalları çek
     with ThreadPoolExecutor(max_workers=5) as executor:
         results = executor.map(fetch_channel, CHANNELS.items())
 
@@ -118,24 +114,23 @@ def update_streams(record=False, duration=3600):
         if record and link:
             record_stream(name, link, duration=duration)
 
-    # Config dosyasını güncelle
+    # Config güncelle
     config["streams"] = streams
     with open(CONFIG_FILE, "w", encoding="utf-8") as f:
         json.dump(config, f, indent=2, ensure_ascii=False)
 
-    # YAML dosyasını oluştur
+    # YAML oluştur
     with open(YAML_FILE, "w", encoding="utf-8") as f:
         yaml.dump(streams, f, allow_unicode=True)
 
-    # M3U8 dosyasını oluştur
-    os.makedirs(os.path.dirname(M3U_FILE) or ".", exist_ok=True)
+    # M3U8 oluştur
     with open(M3U_FILE, "w", encoding="utf-8") as f:
         f.write("#EXTM3U\n")
         for name, data in streams.items():
             f.write(f"#EXTINF:-1,{name}\n")
             f.write(f"{data['url']}\n")
 
-    # channels.txt dosyası
+    # channels.txt oluştur
     output_path = config.get("output_path", "output/channels.txt")
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     with open(output_path, "w", encoding="utf-8") as f:
@@ -145,8 +140,4 @@ def update_streams(record=False, duration=3600):
     print(f"✅ {len(streams)} kanal güncellendi ve M3U8 dosyası oluşturuldu.")
 
 if __name__ == "__main__":
-    # Sadece linkleri güncelle ve M3U8 oluştur
     update_streams(record=False)
-    # Kayıt yapmak istersen:
-    # update_streams(record=True, duration=3600)
-
