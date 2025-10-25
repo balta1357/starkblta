@@ -4,13 +4,13 @@ import json
 import os
 from datetime import datetime
 import subprocess
-from bs4 import BeautifulSoup
 from concurrent.futures import ThreadPoolExecutor
 
 CONFIG_FILE = "config.json"
 YAML_FILE = "streams.yaml"
 M3U_FILE = "streams.m3u8"
 
+# Kanal isimleri ve sayfa linkleri
 CHANNELS = {
     "teve2": "https://www.teve2.com.tr/canli-yayin",
     "showtv": "https://www.showtv.com.tr/canli-yayin",
@@ -30,7 +30,7 @@ CHANNELS = {
     "aspor": "https://www.aspor.com.tr/canli-yayin"
 }
 
-# Tüm kanalların fallback linkleri dolu
+# Kesin fallback linkler
 FALLBACK_LINKS = {
     "teve2": "https://demiroren.daioncdn.net/teve2/teve2.m3u8",
     "showtv": "https://tv.ensonhaber.com/tv/showtv.m3u8",
@@ -63,39 +63,25 @@ def get_stream(channel_name, url):
         html = r.text
         start = html.find(".m3u8")
         if start != -1:
-            # sayfa içinde m3u8 bulduysak linki ayıkla
             link_start = html.rfind("https://", 0, start)
             link = html[link_start:start+len(".m3u8")]
             return link
-    except Exception as e:
-        print(f"❌ {channel_name} alınamadı:", e)
-
+    except Exception:
+        pass
+    # Fallback link kesin kullanılsın
     fallback = FALLBACK_LINKS.get(channel_name)
     if fallback:
         print(f"⚠️ {channel_name}: Yedek link kullanıldı.")
         return fallback
+    print(f"❌ {channel_name}: Link bulunamadı!")
     return None
-
-def record_stream(channel_name, m3u8_url, duration=3600):
-    os.makedirs("recordings", exist_ok=True)
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    filename = f"recordings/{channel_name}_{timestamp}.ts"
-    print(f"🎬 {channel_name} kaydediliyor: {filename}")
-    try:
-        subprocess.run([
-            "ffmpeg", "-y", "-i", m3u8_url, "-c", "copy", "-t", str(duration), filename
-        ], check=True)
-    except FileNotFoundError:
-        print("❌ ffmpeg bulunamadı!")
-    except subprocess.CalledProcessError as e:
-        print(f"❌ {channel_name} kaydı başarısız:", e)
 
 def fetch_channel(name_url):
     name, url = name_url
     link = get_stream(name, url)
     return name, link
 
-def update_streams(record=False, duration=3600):
+def update_streams():
     if not os.path.exists(CONFIG_FILE):
         with open(CONFIG_FILE, "w", encoding="utf-8") as f:
             json.dump({"output_path": "output/channels.txt", "streams": {}}, f, indent=2)
@@ -105,39 +91,38 @@ def update_streams(record=False, duration=3600):
 
     streams = {}
 
-    # Paralel kanalları çek
+    from concurrent.futures import ThreadPoolExecutor
     with ThreadPoolExecutor(max_workers=5) as executor:
         results = executor.map(fetch_channel, CHANNELS.items())
 
     for name, link in results:
         streams[name] = {"url": link, "updated": datetime.now().isoformat()}
-        if record and link:
-            record_stream(name, link, duration=duration)
 
-    # Config güncelle
     config["streams"] = streams
     with open(CONFIG_FILE, "w", encoding="utf-8") as f:
         json.dump(config, f, indent=2, ensure_ascii=False)
 
-    # YAML oluştur
+    # YAML
     with open(YAML_FILE, "w", encoding="utf-8") as f:
         yaml.dump(streams, f, allow_unicode=True)
 
-    # M3U8 oluştur
+    # M3U8
     with open(M3U_FILE, "w", encoding="utf-8") as f:
         f.write("#EXTM3U\n")
         for name, data in streams.items():
-            f.write(f"#EXTINF:-1,{name}\n")
-            f.write(f"{data['url']}\n")
+            if data["url"]:
+                f.write(f"#EXTINF:-1,{name}\n")
+                f.write(f"{data['url']}\n")
 
-    # channels.txt oluştur
+    # channels.txt
     output_path = config.get("output_path", "output/channels.txt")
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     with open(output_path, "w", encoding="utf-8") as f:
         for name, data in streams.items():
-            f.write(f"{name}: {data['url']}\n")
+            if data["url"]:
+                f.write(f"{name}: {data['url']}\n")
 
     print(f"✅ {len(streams)} kanal güncellendi ve M3U8 dosyası oluşturuldu.")
 
 if __name__ == "__main__":
-    update_streams(record=False)
+    update_streams()
