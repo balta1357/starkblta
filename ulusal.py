@@ -9,6 +9,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 CONFIG_FILE = "config.json"
 YAML_FILE = "streams.yaml"
+M3U_FILE = "streams.m3u8"
 
 CHANNELS = {
     "teve2": "https://www.teve2.com.tr/canli-yayin",
@@ -108,6 +109,7 @@ def update_streams(record=False, duration=3600):
     streams = {}
 
     # Paralel olarak kanalları çek
+    from concurrent.futures import ThreadPoolExecutor
     with ThreadPoolExecutor(max_workers=5) as executor:
         results = executor.map(fetch_channel, CHANNELS.items())
 
@@ -125,17 +127,26 @@ def update_streams(record=False, duration=3600):
     with open(YAML_FILE, "w", encoding="utf-8") as f:
         yaml.dump(streams, f, allow_unicode=True)
 
-    # channels.txt güncelle
+    # M3U8 dosyasını oluştur
+    os.makedirs(os.path.dirname(M3U_FILE) or ".", exist_ok=True)
+    with open(M3U_FILE, "w", encoding="utf-8") as f:
+        f.write("#EXTM3U\n")
+        for name, data in streams.items():
+            f.write(f"#EXTINF:-1,{name}\n")
+            f.write(f"{data['url']}\n")
+
+    # channels.txt dosyası
     output_path = config.get("output_path", "output/channels.txt")
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     with open(output_path, "w", encoding="utf-8") as f:
         for name, data in streams.items():
             f.write(f"{name}: {data['url']}\n")
 
-    print(f"✅ {len(streams)} kanal güncellendi.")
+    print(f"✅ {len(streams)} kanal güncellendi ve M3U8 dosyası oluşturuldu.")
 
 if __name__ == "__main__":
-    # Sadece linkleri hızlıca güncelle
+    # Sadece linkleri güncelle ve M3U8 oluştur
     update_streams(record=False)
     # Kayıt yapmak istersen:
     # update_streams(record=True, duration=3600)
+
