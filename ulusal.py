@@ -47,8 +47,13 @@ FALLBACK_LINKS = {
     "atv": "https://tv-atv.medya.trt.com.tr/master.m3u8",
 }
 
+HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                  "AppleWebKit/537.36 (KHTML, like Gecko) "
+                  "Chrome/116.0.0.0 Safari/537.36"
+}
+
 def find_m3u8(html):
-    from bs4 import BeautifulSoup
     soup = BeautifulSoup(html, "html.parser")
     for tag in soup.find_all(["source", "script", "video"]):
         text = str(tag)
@@ -60,13 +65,16 @@ def find_m3u8(html):
 
 def get_stream(channel_name, url):
     try:
-        r = requests.get(url, timeout=10)
+        r = requests.get(url, headers=HEADERS, timeout=10)
         r.raise_for_status()
         link = find_m3u8(r.text)
         if link:
             return link
+    except requests.exceptions.HTTPError as e:
+        print(f"❌ {channel_name} alınamadı: {e}")
     except Exception as e:
         print(f"❌ {channel_name} alınamadı:", e)
+
     fallback = FALLBACK_LINKS.get(channel_name, "")
     if fallback:
         print(f"⚠️ {channel_name}: Yedek link kullanıldı.")
@@ -100,7 +108,6 @@ def update_streams(record=False, duration=3600):
     streams = {}
 
     # Paralel olarak kanalları çek
-    from concurrent.futures import ThreadPoolExecutor
     with ThreadPoolExecutor(max_workers=5) as executor:
         results = executor.map(fetch_channel, CHANNELS.items())
 
@@ -128,9 +135,7 @@ def update_streams(record=False, duration=3600):
     print(f"✅ {len(streams)} kanal güncellendi.")
 
 if __name__ == "__main__":
-    # Örnek kullanım:
     # Sadece linkleri hızlıca güncelle
     update_streams(record=False)
-
     # Kayıt yapmak istersen:
     # update_streams(record=True, duration=3600)
