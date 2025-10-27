@@ -1,50 +1,37 @@
-name: Trgoalas
+name: Auto Push karams.py
 
 on:
+  push:
+    branches:
+      - main
   schedule:
-    - cron: '0 */3 * * *'
-  workflow_dispatch:
+    - cron: '0 * * * *'  # Opsiyonel: her saat çalıştır
 
 jobs:
-  fetch-m3u:
+  update-karams:
     runs-on: ubuntu-latest
-    
-    permissions:
-      contents: write
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
       with:
-        fetch-depth: 0
+        persist-credentials: true
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.10'
-
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install requests
-
-    - name: Run script
-      run: python karams.py
-
-    - name: Verify m3u file
-      run: |
-        if [ ! -f "trgoalas.m3u" ]; then
-          echo "Error: trgoalas.m3u file not found!"
-          exit 1
-        fi
-        echo "File exists, content:"
-        head -n 5 trgoalas.m3u
-
-    - name: Commit and push changes
+    - name: Set up Git
       run: |
         git config --global user.name "GitHub Actions"
         git config --global user.email "actions@github.com"
-        git add trgoalas.m3u
-        git diff --cached --quiet || git commit -m "Auto-update m3u [skip ci]"
-        git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
-        git push origin HEAD:main
+
+    - name: Update karams.py
+      run: |
+        echo "# Güncelleme: $(date)" >> karams.py
+        git add karams.py
+        git commit -m "Automated update to karams.py" || echo "No changes to commit"
+
+    - name: Pull remote changes
+      run: |
+        git pull --rebase origin main || echo "No remote changes"
+
+    - name: Push changes
+      run: |
+        git push origin main
