@@ -224,3 +224,4 @@ if __name__ == "__main__":
         print(f"\n{YELLOW}[İptal edildi] Son index kaydediliyor...{RESET}")
         sys.exit(0)
 # Güncelleme: Mon Oct 27 12:34:15 UTC 2025
+# Güncelleme: Mon Oct 27 12:41:06 UTC 2025
