@@ -29,22 +29,22 @@ jobs:
         pip install requests
 
     - name: Run script
-      run: python karams.py
+      run: python trgoalas.py
 
     - name: Verify m3u file
       run: |
         if [ ! -f "trgoalas.m3u" ]; then
-          echo "Error: karams.m3u file not found!"
+          echo "Error: trgoalas.m3u file not found!"
           exit 1
         fi
         echo "File exists, content:"
-        head -n 5 karams.m3u
+        head -n 5 trgoalas.m3u
 
     - name: Commit and push changes
       run: |
         git config --global user.name "GitHub Actions"
         git config --global user.email "actions@github.com"
-        git add karams.m3u
+        git add trgoalas.m3u
         git diff --cached --quiet || git commit -m "Auto-update m3u [skip ci]"
         git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
         git push origin HEAD:main
