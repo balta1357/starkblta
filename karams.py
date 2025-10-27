@@ -162,7 +162,7 @@ if __name__ == "__main__":
             sys.exit(1)
 
         playlist = generate_m3u(base_url, site, "Mozilla/5.0")
-        with open("trgoalas.m3u", "w", encoding="utf-8") as f:
+        with open("karams.m3u", "w", encoding="utf-8") as f:
             f.write(playlist)
 
         print(f"{GREEN}[OK] Playlist oluşturuldu: karams.m3u{RESET}")
