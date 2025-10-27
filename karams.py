@@ -225,3 +225,4 @@ if __name__ == "__main__":
         sys.exit(0)
 # Güncelleme: Mon Oct 27 12:34:15 UTC 2025
 # Güncelleme: Mon Oct 27 12:41:06 UTC 2025
+# Güncelleme: Mon Oct 27 12:43:19 UTC 2025
