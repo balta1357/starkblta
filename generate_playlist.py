@@ -24,7 +24,7 @@ source_urls = {
     "htspor": "https://www.htspor.com/canli-yayin",
     "tv8": "https://www.tv8.com.tr/canli-yayin",
     "tv8bucuk": "https://www.tv8bucuk.com/tv8-5-canli-yayin",
-    "atv": "https://www.atv.com.tr/canli-yayin",
+    "atv": "http://89.187.191.41/ATV-HD-TR/tracks-v1a1/mono.m3u8",
     "kanald": "https://www.kanald.com.tr/canli-yayin",
     "teve2": "https://www.teve2.com.tr/canli-yayin",
     "dmax": "https://www.dmax.com.tr/canli-izle",
