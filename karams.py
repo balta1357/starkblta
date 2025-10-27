@@ -223,3 +223,4 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         print(f"\n{YELLOW}[İptal edildi] Son index kaydediliyor...{RESET}")
         sys.exit(0)
+# Güncelleme: Mon Oct 27 12:34:15 UTC 2025
