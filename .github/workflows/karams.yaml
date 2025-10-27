@@ -1,6 +1,7 @@
 name: Auto Force Push karams.py
 
 on:
+  workflow_dispatch:  # Bu satır manuel tetikleme için gerekli
   push:
     branches:
       - main
@@ -15,7 +16,7 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
       with:
-        persist-credentials: true  # GitHub token ile push izni verir
+        persist-credentials: true
 
     - name: Set up Git
       run: |
@@ -24,7 +25,6 @@ jobs:
 
     - name: Update karams.py
       run: |
-        # Örnek: her çalıştırmada dosyaya tarih ekler
         echo "# Güncelleme: $(date)" >> karams.py
         git add karams.py
         git commit -m "Automated update to karams.py" || echo "No changes to commit"
