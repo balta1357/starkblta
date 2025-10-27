@@ -1,4 +1,4 @@
-name: Auto Push karams.py
+name: Auto Force Push karams.py
 
 on:
   push:
@@ -8,14 +8,14 @@ on:
     - cron: '0 * * * *'  # Opsiyonel: her saat çalıştır
 
 jobs:
-  update-karams:
+  update-karams-force:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
       with:
-        persist-credentials: true
+        persist-credentials: true  # GitHub token ile push izni verir
 
     - name: Set up Git
       run: |
@@ -24,14 +24,11 @@ jobs:
 
     - name: Update karams.py
       run: |
+        # Örnek: her çalıştırmada dosyaya tarih ekler
         echo "# Güncelleme: $(date)" >> karams.py
         git add karams.py
         git commit -m "Automated update to karams.py" || echo "No changes to commit"
 
-    - name: Pull remote changes
+    - name: Force Push changes
       run: |
-        git pull --rebase origin main || echo "No remote changes"
-
-    - name: Push changes
-      run: |
-        git push origin main
+        git push origin main --force
