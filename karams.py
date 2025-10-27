@@ -8,22 +8,31 @@ from pathlib import Path
 
 # --------------------
 # Ayarlar
-LAST_FILE = Path("last_index.txt")  # Son denenen/bulunan index burada saklanır
-DEFAULT_START = 1300                # Kayıt yoksa buradan başla
-THREAD_SAYISI = 30                  # Aynı anda kontrol edilecek domain sayısı
-BATCH_SIZE = THREAD_SAYISI          # Her batch’te denenecek domain sayısı
-SLEEP_BETWEEN_BATCHES = 0.15        # Batch’ler arası bekleme (sn)
-MAX_EMPTY_BATCHES = None            # None => sonsuz arama (bulana kadar)
-REQUEST_TIMEOUT = 4                 # Her HTTP isteği için zaman aşımı (sn)
+LAST_FILE = Path("last_index.txt")
+LAST_FOUND_FILE = Path("last_found.txt")  # bulunduysa tam URL buraya kaydedilir
+DEFAULT_START = 1300
+THREAD_SAYISI = 30
+BATCH_SIZE = THREAD_SAYISI
+SLEEP_BETWEEN_BATCHES = 0.15
+MAX_EMPTY_BATCHES = None
+REQUEST_TIMEOUT = 4
+# Domain patternleri (isteğe göre yeni pattern / tld ekle)
+PREFIX_PATTERNS = [
+    "trgoals{n}",         # orijinal
+    "trgoals-{n}",
+    "trgoals{n}tv",
+    "trgoals{n}-tv",
+    "trgoals{n}online",
+    "trgoal{n}",
+]
+TLDS = [".xyz", ".com", ".net", ".site", ".online"]
 # --------------------
 
-# Terminal renkleri
 RED = "\033[91m"
 GREEN = "\033[92m"
 YELLOW = "\033[93m"
 RESET = "\033[0m"
 
-# 🔹 TAM KANAL LİSTESİ 🔹
 KANALLAR = [
     {"dosya": "yayinzirve.m3u8", "tvg_id": "BeinSports1.tr", "kanal_adi": "Bein Sports 1 HD (VIP)"},
     {"dosya": "yayin1.m3u8", "tvg_id": "BeinSports1.tr", "kanal_adi": "Bein Sports 1 HD"},
@@ -58,14 +67,11 @@ KANALLAR = [
     {"dosya": "yayinex8.m3u8", "tvg_id": "ExxenSpor8.tr", "kanal_adi": "Exxen Spor 8 HD"},
 ]
 
-# --------------------
-
 dur_event = threading.Event()
 found_lock = threading.Lock()
 found_result = {"url": None, "index": None}
 
 def read_last_index():
-    """Kaydedilmiş son index'i oku."""
     try:
         if LAST_FILE.exists():
             return int(LAST_FILE.read_text().strip())
@@ -74,34 +80,81 @@ def read_last_index():
     return None
 
 def write_last_index(idx):
-    """Son index'i güvenli şekilde dosyaya yaz."""
     try:
         LAST_FILE.write_text(str(int(idx)))
     except Exception:
         print(f"{YELLOW}[Uyarı] last_index.txt yazılamadı.{RESET}")
 
+def read_last_found():
+    try:
+        if LAST_FOUND_FILE.exists():
+            txt = LAST_FOUND_FILE.read_text().strip()
+            if txt:
+                return txt
+    except Exception:
+        pass
+    return None
+
+def write_last_found(url):
+    try:
+        LAST_FOUND_FILE.write_text(url)
+    except Exception:
+        print(f"{YELLOW}[Uyarı] last_found.txt yazılamadı.{RESET}")
+
+def generate_candidate_domains(i):
+    """PREFIX_PATTERNS ve TLDS kullanarak domain adlarını üret."""
+    for p in PREFIX_PATTERNS:
+        name = p.format(n=i)
+        for t in TLDS:
+            yield f"https://{name}{t}/"
+
 def kontrol_et(i):
-    """Belirtilen domain numarasını kontrol et."""
+    """Artık her index için çeşitli domain pattern'lerini dener."""
     if dur_event.is_set():
         return None
-    url = f"https://trgoals{i}.xyz/"
-    try:
-        r = requests.get(url, timeout=REQUEST_TIMEOUT)
-        if r.status_code == 200:
-            if "channel.html?id=" in r.text:
+    # Eğer last_found varsa önce onu kontrol et (tek seferlik hızlı doğrulama)
+    last_found = read_last_found()
+    if last_found:
+        try:
+            r = requests.get(last_found, timeout=REQUEST_TIMEOUT)
+            if r.status_code == 200 and "channel.html?id=" in r.text:
                 with found_lock:
                     if not found_result["url"]:
-                        found_result["url"] = url
-                        found_result["index"] = i
-                print(f"{GREEN}[OK] Yayın bulundu: {url}{RESET}")
+                        found_result["url"] = last_found
+                        found_result["index"] = i  # index bilinmiyorsa i yaz (yaklaşık)
+                write_last_found(last_found)
                 dur_event.set()
-                return (i, url)
+                print(f"{GREEN}[OK] Önceden kayıtlı domain hâlâ canlı: {last_found}{RESET}")
+                return (i, last_found)
+        except requests.RequestException:
+            # kayıtlı domain çalışmıyor, devam edilecek
+            pass
+
+    # Aşağıda i için oluşturulan kombinasyonları dener
+    for candidate in generate_candidate_domains(i):
+        if dur_event.is_set():
+            return None
+        try:
+            r = requests.get(candidate, timeout=REQUEST_TIMEOUT)
+            if r.status_code == 200:
+                if "channel.html?id=" in r.text:
+                    with found_lock:
+                        if not found_result["url"]:
+                            found_result["url"] = candidate
+                            found_result["index"] = i
+                    write_last_found(candidate)
+                    print(f"{GREEN}[OK] Yayın bulundu: {candidate}{RESET}")
+                    dur_event.set()
+                    return (i, candidate)
+                else:
+                    print(f"{YELLOW}[-] {candidate} aktif ama yayın linki yok.{RESET}")
             else:
-                print(f"{YELLOW}[-] {url} aktif ama yayın yok.{RESET}")
-        else:
-            print(f"{RED}[-] {url} yanıt kodu {r.status_code}.{RESET}")
-    except requests.RequestException:
-        print(f"{RED}[-] {url} erişilemedi.{RESET}")
+                # opsiyonel: sessiz bırakmak istersen bu satırı yorum satırı yap
+                print(f"{RED}[-] {candidate} yanıt kodu {r.status_code}.{RESET}")
+        except requests.RequestException:
+            # erişilemediğini sessizce geçebilirsin
+            # print(f"{RED}[-] {candidate} erişilemedi.{RESET}")
+            pass
     return None
 
 def siteyi_bul_otomatik():
@@ -162,10 +215,10 @@ if __name__ == "__main__":
             sys.exit(1)
 
         playlist = generate_m3u(base_url, site, "Mozilla/5.0")
-        with open("karams.m3u", "w", encoding="utf-8") as f:
+        with open("trgoalas.m3u", "w", encoding="utf-8") as f:
             f.write(playlist)
 
-        print(f"{GREEN}[OK] Playlist oluşturuldu: karams.m3u{RESET}")
+        print(f"{GREEN}[OK] Playlist oluşturuldu: trgoalas.m3u{RESET}")
 
     except KeyboardInterrupt:
         print(f"\n{YELLOW}[İptal edildi] Son index kaydediliyor...{RESET}")
